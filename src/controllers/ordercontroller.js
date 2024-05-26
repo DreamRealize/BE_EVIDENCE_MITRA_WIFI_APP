@@ -147,3 +147,21 @@ export const getOrderById = async (req, res) => {
       res.status(500).json({ error: "Internal Server Error" });
    }
 };
+
+export const deleteOrderAdmin = async (req, res) => {
+   try {
+      const { idOrder } = req.params;
+
+      // Hapus pemasukan berdasarkan idOrder
+      const deleteOrderAdmin = await prisma.order.delete({
+         where: {
+            idOrder: parseInt(idOrder),
+         },
+      });
+
+      res.json({ message: "order deleted successfully", deleteOrderAdmin });
+   } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+   }
+};
