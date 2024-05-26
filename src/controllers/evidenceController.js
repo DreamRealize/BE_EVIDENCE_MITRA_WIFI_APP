@@ -87,3 +87,21 @@ export const insertEviden = async (req, res) => {
       });
    }
 };
+
+export const deleteEvidenceMitra = async (req, res) => {
+   try {
+      const { idEviden } = req.params;
+
+      // Hapus pemasukan berdasarkan idEviden
+      const deleteEvidenceMitra = await prisma.eviden.delete({
+         where: {
+            idEviden: parseInt(idEviden),
+         },
+      });
+
+      res.json({ message: "eviden deleted successfully", deleteEvidenceMitra });
+   } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+   }
+};
