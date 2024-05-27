@@ -105,3 +105,84 @@ export const deleteEvidenceMitra = async (req, res) => {
       res.status(500).json({ error: "Internal Server Error" });
    }
 };
+
+export const updateEviden = async (req, res) => {
+   try {
+      const { idEviden } = req.params;
+      const {
+         idUsers,
+         idTiket,
+         idService,
+         waktuEviden,
+         notedEviden,
+         idStatusOrder,
+         idStatusEvidence,
+      } = req.body;
+
+      const today = new Date();
+      const inputDate = new Date(waktuEviden);
+
+      // Validasi tambahan jika diperlukan
+      if (
+         isNaN(inputDate) ||
+         inputDate > today ||
+         inputDate.getFullYear() !== today.getFullYear() ||
+         inputDate.getMonth() > 11 // Perhatikan bahwa bulan dari 0-11 (Januari adalah 0)
+      ) {
+         return res.status(400).json({ error: "waktu eviden tidak valid" });
+      }
+
+      const updateEviden = await prisma.eviden.update({
+         where: {
+            idEviden: parseInt(idEviden),
+         },
+         data: {
+            idUsers,
+            idTiket,
+            idService,
+            waktuEviden,
+            notedEviden,
+            idStatusOrder,
+            idStatusEvidence,
+         },
+         include: {
+            user: true,
+            service: true,
+            statusOrder: true,
+            statusEviden: true,
+            order: true,
+         },
+      });
+
+      res.json({ message: "eviden updated successfully", updateEviden });
+   } catch (error) {
+      res.status(500).json({
+         message: error.message,
+         response: null,
+      });
+   }
+};
+
+export const getEvidenceById = async (req, res) => {
+   try {
+      const { idEviden } = req.params;
+
+      const eviden = await prisma.eviden.findUnique({
+         where: {
+            idEviden: parseInt(idEviden),
+         },
+         include: {
+            order: true,
+         },
+      });
+
+      if (!eviden) {
+         return res.status(404).json({ error: "eviden not found" });
+      }
+
+      res.json({ data: eviden });
+   } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+   }
+};
